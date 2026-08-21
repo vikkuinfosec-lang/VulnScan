@@ -23,3 +23,9 @@ vulnscan = "vulnscan.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["vulnscan*"]
+
+[tool.pytest.ini_options]
+# Without this, invoking the bare `pytest` command (rather than `python -m pytest`)
+# doesn't put the repo root on sys.path, so `import vulnscan` fails in test files —
+# this bit CI, which runs `pytest` directly rather than `python -m pytest`.
+pythonpath = ["."]
