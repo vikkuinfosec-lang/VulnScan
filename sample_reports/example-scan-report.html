@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vulnerability Scan Report — https://example.com</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem;
+    background: #0f172a; color: #e2e8f0;
+  }
+  h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+  .meta { color: #94a3b8; margin-bottom: 1.5rem; font-size: 0.9rem; }
+  .summary { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+  .card {
+    background: #1e293b; border-radius: 8px; padding: 1rem 1.5rem;
+    text-align: center; min-width: 100px;
+  }
+  .card-count { font-size: 2rem; font-weight: 700; }
+  .card-label { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+  table { width: 100%; border-collapse: collapse; background: #1e293b; border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid #334155; vertical-align: top; }
+  th { background: #0f172a; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; }
+  tr:last-child td { border-bottom: none; }
+  .badge { color: white; padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+  .finding-title { font-weight: 600; margin-bottom: 0.25rem; }
+  .finding-desc { color: #94a3b8; font-size: 0.9rem; }
+  code { background: #0f172a; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem; }
+  .empty { color: #4ade80; }
+  .errors { color: #fca5a5; }
+  footer { margin-top: 2rem; color: #64748b; font-size: 0.8rem; }
+  @media (prefers-color-scheme: light) {
+    body { background: #f8fafc; color: #0f172a; }
+    .card, table { background: #ffffff; }
+    th { background: #f1f5f9; }
+    td { border-bottom-color: #e2e8f0; }
+    code { background: #f1f5f9; }
+  }
+</style>
+</head>
+<body>
+  <h1>Vulnerability Scan Report</h1>
+  <div class="meta">
+    Target: <strong>https://example.com</strong> &nbsp;|&nbsp;
+    Scanned: 2026-08-21T09:18:42.492557+00:00 &nbsp;|&nbsp;
+    Duration: 14.13s &nbsp;|&nbsp;
+    Findings: 14
+  </div>
+  <div class="summary">
+        <div class="card">
+          <div class="card-count" style="color:#dc2626">2</div>
+          <div class="card-label">High</div>
+        </div>
+        <div class="card">
+          <div class="card-count" style="color:#d97706">4</div>
+          <div class="card-label">Medium</div>
+        </div>
+        <div class="card">
+          <div class="card-count" style="color:#2563eb">3</div>
+          <div class="card-label">Low</div>
+        </div>
+        <div class="card">
+          <div class="card-count" style="color:#6b7280">5</div>
+          <div class="card-label">Info</div>
+        </div></div>
+  
+        <table>
+          <thead>
+            <tr><th>Severity</th><th>ID</th><th>Category</th><th>Finding</th><th>Evidence</th><th>Remediation</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge" style="background:#dc2626">High</span></td>
+              <td>HDR-HSTS</td>
+              <td>Headers</td>
+              <td>
+                <div class="finding-title">Missing Strict-Transport-Security (HSTS) header</div>
+                <div class="finding-desc">Without HSTS, browsers will happily fall back to plain HTTP for this site, which lets an on-path attacker downgrade the connection and intercept or tamper with traffic (SSL-stripping).</div>
+              </td>
+              <td><code>No Strict-Transport-Security header on https://example.com</code></td>
+              <td>Add a response header such as &#x27;Strict-Transport-Security: max-age=63072000; includeSubDomains; preload&#x27; once you&#x27;re confident every subdomain is served over HTTPS.</td>
+            </tr>
+            <tr>
+              <td><span class="badge" style="background:#dc2626">High</span></td>
+              <td>HDR-NO-HTTPS-REDIRECT</td>
+              <td>Headers</td>
+              <td>
+                <div class="finding-title">Plain HTTP is served without redirecting to HTTPS</div>
+                <div class="finding-desc">The site responds on plain HTTP without redirecting to HTTPS, so a user who types the bare domain (or follows an http:// link) will have their traffic sent unencrypted, exposing it to interception and tampering.</div>
+              </td>
+              <td><code>GET http://example.com did not redirect to https:// (final URL: http://example.com/)</code></td>
+              <td>Configure the web server/load balancer to redirect all HTTP requests to HTTPS (301/308), and add HSTS once that&#x27;s in place.</td>
+            </tr>
+            <tr>
+              <td><span class="badge" style="background:#d97706">Medium</span></td>
+              <td>HDR-CSP</td>
+              <td>Headers</td>
+              <td>
+                <div class="finding-title">Missing Content-Security-Policy header</div>
+                <div class="finding-desc">Without a CSP, the browser has no server-defined restriction on which scripts/styles/frames can load, which widens the impact of any XSS vulnerability elsewhere on the site.</div>
+              </td>
+              <td><code>No Content-Security-Policy header present</code></td>
+              <td>Define a Content-Security-Policy appropriate to the site, starting restrictive (e.g. default-src &#x27;self&#x27;) and loosening only as needed.</td>
+            </tr>
+            <tr>
+              <td><span class="badge" style="background:#d97706">Medium</span></td>
+              <td>HDR-XFO</td>
+              <td>Headers</td>
+              <td>
+                <div class="finding-title">Missing clickjacking protection (X-Frame-Options / frame-ancestors)</div>
+                <div class="finding-desc">Neither X-Frame-Options nor a CSP frame-ancestors directive is set, so the page can be embedded in an iframe on another site and used for a clickjacking attack.</div>
+              </td>
+              <td><code>No X-Frame-Options header and no CSP frame-ancestors directive</code></td>
+              <td>Add &#x27;X-Frame-Options: DENY&#x27; (or SAMEORIGIN if framing by your own site is needed), or set &#x27;frame-ancestors&#x27; in your CSP.</td>
+            </tr>
+            <tr>
+              <td><span class="badge" style="background:#d97706">Medium</span></td>
+              <td>TLS-LEGACY-TLS10</td>
+              <td>TLS</td>
+              <td>
+                <div class="finding-title">Server accepts outdated TLS 1.0 connections</div>
+                <div class="finding-desc">TLS 1.0 is deprecated and has known weaknesses. Its continued support allows a downgrade attack to force a weaker connection.</div>
+              </td>
+              <td><code>TLS handshake pinned to TLS 1.0 succeeded</code></td>
+              <td>Disable TLS 1.0 in the server&#x27;s TLS configuration; support only TLS 1.2 and TLS 1.3.</td>
+            </tr>
+            <tr>
+              <td><span class="badge" style="background:#d97706">Medium</span></td>
+              <td>TLS-LEGACY-TLS11</td>
+              <td>TLS</td>
+              <td>
+                <div class="finding-title">Server accepts outdated TLS 1.1 connections</div>
+                <div class="finding-desc">TLS 1.1 is deprecated and has known weaknesses. Its continued support allows a downgrade attack to force a weaker connection.</div>
+              </td>
+              <td><code>TLS handshake pinned to TLS 1.1 succeeded</code></td>
+              <td>Disable TLS 1.1 in the server&#x27;s TLS configuration; support only TLS 1.2 and TLS 1.3.</td>
+            </tr>
+            <tr>
+              <td><span class="badge" style="background:#2563eb">Low</span></td>
+              <td>HDR-DISC-SERVER</td>
+              <td>Headers</td>
+              <td>
+                <div class="finding-title">Server header discloses server/technology details</div>
+                <div class="finding-desc">Revealing the exact server software/version (or backend framework) makes it easier for an attacker to look up known vulnerabilities for that specific version.</div>
+              </td>
+              <td><code>Server: cloudflare</code></td>
+              <td>Suppress or generalize the Server header at the web server/proxy/framework level.</td>
+            </tr>
+            <tr>
+              <td><span class="badge" style="background:#2563eb">Low</span></td>
+              <td>HDR-REFPOL</td>
+              <td>Headers</td>
+              <td>
+                <div class="finding-title">Missing Referrer-Policy header</div>
+                <div class="finding-desc">Without a Referrer-Policy, the browser&#x27;s default behavior may leak the full URL (including sensitive query parameters) to third parties in outbound links and resource requests.</div>
+              </td>
+              <td><code>No Referrer-Policy header present</code></td>
+              <td>Add a header such as &#x27;Referrer-Policy: strict-origin-when-cross-origin&#x27;.</td>
+            </tr>
+            <tr>
+              <td><span class="badge" style="background:#2563eb">Low</span></td>
+              <td>HDR-XCTO</td>
+              <td>Headers</td>
+              <td>
+                <div class="finding-title">Missing X-Content-Type-Options header</div>
+                <div class="finding-desc">Without &#x27;nosniff&#x27;, some browsers will try to guess (MIME-sniff) a response&#x27;s content type, which can turn an upload/reflection endpoint into an XSS vector.</div>
+              </td>
+              <td><code>X-Content-Type-Options: (missing)</code></td>
+              <td>Add the response header &#x27;X-Content-Type-Options: nosniff&#x27;.</td>
+            </tr>
+            <tr>
+              <td><span class="badge" style="background:#6b7280">Info</span></td>
+              <td>HDR-PERMPOL</td>
+              <td>Headers</td>
+              <td>
+                <div class="finding-title">Missing Permissions-Policy header</div>
+                <div class="finding-desc">Permissions-Policy lets you explicitly disable powerful browser features (camera, microphone, geolocation, etc.) that the site doesn&#x27;t use, reducing the blast radius of any injected script.</div>
+              </td>
+              <td><code>No Permissions-Policy header present</code></td>
+              <td>Add a Permissions-Policy header disabling features the site doesn&#x27;t need, e.g. &#x27;Permissions-Policy: camera=(), microphone=(), geolocation=()&#x27;.</td>
+            </tr>
+            <tr>
+              <td><span class="badge" style="background:#6b7280">Info</span></td>
+              <td>PORT-443-OPEN</td>
+              <td>Ports</td>
+              <td>
+                <div class="finding-title">Port 443 (HTTPS) is open</div>
+                <div class="finding-desc">HTTPS on port 443 is reachable. Confirm this is intentional and necessary for this host to expose publicly.</div>
+              </td>
+              <td><code>TCP connect to example.com:443 succeeded</code></td>
+              <td>Close this port if it isn&#x27;t intentionally public, or restrict it with a firewall.</td>
+            </tr>
+            <tr>
+              <td><span class="badge" style="background:#6b7280">Info</span></td>
+              <td>PORT-80-OPEN</td>
+              <td>Ports</td>
+              <td>
+                <div class="finding-title">Port 80 (HTTP) is open</div>
+                <div class="finding-desc">HTTP on port 80 is reachable. Confirm this is intentional and necessary for this host to expose publicly.</div>
+              </td>
+              <td><code>TCP connect to example.com:80 succeeded</code></td>
+              <td>Close this port if it isn&#x27;t intentionally public, or restrict it with a firewall.</td>
+            </tr>
+            <tr>
+              <td><span class="badge" style="background:#6b7280">Info</span></td>
+              <td>PORT-8080-OPEN</td>
+              <td>Ports</td>
+              <td>
+                <div class="finding-title">Port 8080 (Alt HTTP (proxy/admin)) is open</div>
+                <div class="finding-desc">Alt HTTP (proxy/admin) on port 8080 is reachable. Confirm this is intentional and necessary for this host to expose publicly.</div>
+              </td>
+              <td><code>TCP connect to example.com:8080 succeeded</code></td>
+              <td>Close this port if it isn&#x27;t intentionally public, or restrict it with a firewall.</td>
+            </tr>
+            <tr>
+              <td><span class="badge" style="background:#6b7280">Info</span></td>
+              <td>PORT-8443-OPEN</td>
+              <td>Ports</td>
+              <td>
+                <div class="finding-title">Port 8443 (Alt HTTPS) is open</div>
+                <div class="finding-desc">Alt HTTPS on port 8443 is reachable. Confirm this is intentional and necessary for this host to expose publicly.</div>
+              </td>
+              <td><code>TCP connect to example.com:8443 succeeded</code></td>
+              <td>Close this port if it isn&#x27;t intentionally public, or restrict it with a firewall.</td>
+            </tr></tbody>
+        </table>
+  
+  <footer>Generated by vulnscan — for authorized security testing only.</footer>
+</body>
+</html>

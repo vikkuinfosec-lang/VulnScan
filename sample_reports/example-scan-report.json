@@ -1,0 +1,168 @@
+{
+  "target": "https://example.com",
+  "started_at": "2026-08-21T09:18:56.929417+00:00",
+  "finished_at": "2026-08-21T09:19:12.247331+00:00",
+  "duration_seconds": 15.317914,
+  "summary": {
+    "High": 2,
+    "Medium": 4,
+    "Low": 3,
+    "Info": 5
+  },
+  "findings": [
+    {
+      "id": "HDR-HSTS",
+      "title": "Missing Strict-Transport-Security (HSTS) header",
+      "severity": "High",
+      "category": "Headers",
+      "description": "Without HSTS, browsers will happily fall back to plain HTTP for this site, which lets an on-path attacker downgrade the connection and intercept or tamper with traffic (SSL-stripping).",
+      "evidence": "No Strict-Transport-Security header on https://example.com",
+      "remediation": "Add a response header such as 'Strict-Transport-Security: max-age=63072000; includeSubDomains; preload' once you're confident every subdomain is served over HTTPS.",
+      "references": [
+        "https://owasp.org/www-project-secure-headers/",
+        "https://hstspreload.org/"
+      ]
+    },
+    {
+      "id": "HDR-NO-HTTPS-REDIRECT",
+      "title": "Plain HTTP is served without redirecting to HTTPS",
+      "severity": "High",
+      "category": "Headers",
+      "description": "The site responds on plain HTTP without redirecting to HTTPS, so a user who types the bare domain (or follows an http:// link) will have their traffic sent unencrypted, exposing it to interception and tampering.",
+      "evidence": "GET http://example.com did not redirect to https:// (final URL: http://example.com/)",
+      "remediation": "Configure the web server/load balancer to redirect all HTTP requests to HTTPS (301/308), and add HSTS once that's in place.",
+      "references": []
+    },
+    {
+      "id": "HDR-CSP",
+      "title": "Missing Content-Security-Policy header",
+      "severity": "Medium",
+      "category": "Headers",
+      "description": "Without a CSP, the browser has no server-defined restriction on which scripts/styles/frames can load, which widens the impact of any XSS vulnerability elsewhere on the site.",
+      "evidence": "No Content-Security-Policy header present",
+      "remediation": "Define a Content-Security-Policy appropriate to the site, starting restrictive (e.g. default-src 'self') and loosening only as needed.",
+      "references": [
+        "https://owasp.org/www-project-secure-headers/"
+      ]
+    },
+    {
+      "id": "HDR-XFO",
+      "title": "Missing clickjacking protection (X-Frame-Options / frame-ancestors)",
+      "severity": "Medium",
+      "category": "Headers",
+      "description": "Neither X-Frame-Options nor a CSP frame-ancestors directive is set, so the page can be embedded in an iframe on another site and used for a clickjacking attack.",
+      "evidence": "No X-Frame-Options header and no CSP frame-ancestors directive",
+      "remediation": "Add 'X-Frame-Options: DENY' (or SAMEORIGIN if framing by your own site is needed), or set 'frame-ancestors' in your CSP.",
+      "references": [
+        "https://owasp.org/www-project-secure-headers/"
+      ]
+    },
+    {
+      "id": "TLS-LEGACY-TLS10",
+      "title": "Server accepts outdated TLS 1.0 connections",
+      "severity": "Medium",
+      "category": "TLS",
+      "description": "TLS 1.0 is deprecated and has known weaknesses. Its continued support allows a downgrade attack to force a weaker connection.",
+      "evidence": "TLS handshake pinned to TLS 1.0 succeeded",
+      "remediation": "Disable TLS 1.0 in the server's TLS configuration; support only TLS 1.2 and TLS 1.3.",
+      "references": []
+    },
+    {
+      "id": "TLS-LEGACY-TLS11",
+      "title": "Server accepts outdated TLS 1.1 connections",
+      "severity": "Medium",
+      "category": "TLS",
+      "description": "TLS 1.1 is deprecated and has known weaknesses. Its continued support allows a downgrade attack to force a weaker connection.",
+      "evidence": "TLS handshake pinned to TLS 1.1 succeeded",
+      "remediation": "Disable TLS 1.1 in the server's TLS configuration; support only TLS 1.2 and TLS 1.3.",
+      "references": []
+    },
+    {
+      "id": "HDR-DISC-SERVER",
+      "title": "Server header discloses server/technology details",
+      "severity": "Low",
+      "category": "Headers",
+      "description": "Revealing the exact server software/version (or backend framework) makes it easier for an attacker to look up known vulnerabilities for that specific version.",
+      "evidence": "Server: cloudflare",
+      "remediation": "Suppress or generalize the Server header at the web server/proxy/framework level.",
+      "references": []
+    },
+    {
+      "id": "HDR-REFPOL",
+      "title": "Missing Referrer-Policy header",
+      "severity": "Low",
+      "category": "Headers",
+      "description": "Without a Referrer-Policy, the browser's default behavior may leak the full URL (including sensitive query parameters) to third parties in outbound links and resource requests.",
+      "evidence": "No Referrer-Policy header present",
+      "remediation": "Add a header such as 'Referrer-Policy: strict-origin-when-cross-origin'.",
+      "references": [
+        "https://owasp.org/www-project-secure-headers/"
+      ]
+    },
+    {
+      "id": "HDR-XCTO",
+      "title": "Missing X-Content-Type-Options header",
+      "severity": "Low",
+      "category": "Headers",
+      "description": "Without 'nosniff', some browsers will try to guess (MIME-sniff) a response's content type, which can turn an upload/reflection endpoint into an XSS vector.",
+      "evidence": "X-Content-Type-Options: (missing)",
+      "remediation": "Add the response header 'X-Content-Type-Options: nosniff'.",
+      "references": [
+        "https://owasp.org/www-project-secure-headers/"
+      ]
+    },
+    {
+      "id": "HDR-PERMPOL",
+      "title": "Missing Permissions-Policy header",
+      "severity": "Info",
+      "category": "Headers",
+      "description": "Permissions-Policy lets you explicitly disable powerful browser features (camera, microphone, geolocation, etc.) that the site doesn't use, reducing the blast radius of any injected script.",
+      "evidence": "No Permissions-Policy header present",
+      "remediation": "Add a Permissions-Policy header disabling features the site doesn't need, e.g. 'Permissions-Policy: camera=(), microphone=(), geolocation=()'.",
+      "references": [
+        "https://owasp.org/www-project-secure-headers/"
+      ]
+    },
+    {
+      "id": "PORT-443-OPEN",
+      "title": "Port 443 (HTTPS) is open",
+      "severity": "Info",
+      "category": "Ports",
+      "description": "HTTPS on port 443 is reachable. Confirm this is intentional and necessary for this host to expose publicly.",
+      "evidence": "TCP connect to example.com:443 succeeded",
+      "remediation": "Close this port if it isn't intentionally public, or restrict it with a firewall.",
+      "references": []
+    },
+    {
+      "id": "PORT-80-OPEN",
+      "title": "Port 80 (HTTP) is open",
+      "severity": "Info",
+      "category": "Ports",
+      "description": "HTTP on port 80 is reachable. Confirm this is intentional and necessary for this host to expose publicly.",
+      "evidence": "TCP connect to example.com:80 succeeded",
+      "remediation": "Close this port if it isn't intentionally public, or restrict it with a firewall.",
+      "references": []
+    },
+    {
+      "id": "PORT-8080-OPEN",
+      "title": "Port 8080 (Alt HTTP (proxy/admin)) is open",
+      "severity": "Info",
+      "category": "Ports",
+      "description": "Alt HTTP (proxy/admin) on port 8080 is reachable. Confirm this is intentional and necessary for this host to expose publicly.",
+      "evidence": "TCP connect to example.com:8080 succeeded",
+      "remediation": "Close this port if it isn't intentionally public, or restrict it with a firewall.",
+      "references": []
+    },
+    {
+      "id": "PORT-8443-OPEN",
+      "title": "Port 8443 (Alt HTTPS) is open",
+      "severity": "Info",
+      "category": "Ports",
+      "description": "Alt HTTPS on port 8443 is reachable. Confirm this is intentional and necessary for this host to expose publicly.",
+      "evidence": "TCP connect to example.com:8443 succeeded",
+      "remediation": "Close this port if it isn't intentionally public, or restrict it with a firewall.",
+      "references": []
+    }
+  ],
+  "errors": []
+}
